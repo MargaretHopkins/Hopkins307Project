@@ -4,7 +4,7 @@
 The goal of this project was to create a simple model for the additive synthesis of flugelhorn notes based on a group of sample notes, using linear interpolation. The model can be used either with input of a recording of a single note played on the trumpet, or a MIDI note number. In the case of the first note, the output is an additively synthesized note based on the flugelhorn model at the same pitch as the trumpet note, while in the second case, the output is an additively synthesized note at the specified MIDI pitch. 
 
 ## Background
-The flugelhorn and trumpet are both brass instruments in the key of B flat, both made of 1.48m of metal pipe. **make note of transposition**  Though the two instruments are nearly identical in playing technique, they have distinct tones. The trumpet is often described as having a more bright, brilliant tone than the mellower-sounding flugelhorn (Forsyth 165). The main physical difference between the flugelhorn and the trumpet is the conicality of the pipes. While both are cylindro-conical, i.e., combining cylindrical and conical sections, the flugelhorn is more conical than the trumpet. **talk about pg 411 in Benade for cylindrical/conical distinction**
+The flugelhorn and trumpet are both brass instruments in the key of B flat, both made of 1.48m of metal pipe. Note that, as the flugelhorn and trumpet are instruments in B flat, the note names will refer by default to notes in this key, though the concert pitch note names will sometimes be included for clarity. Though the two instruments are nearly identical in playing technique, they have distinct tones. The trumpet is often described as having a more bright, brilliant tone than the mellower-sounding flugelhorn (Forsyth 1949, 165). The main physical difference between the flugelhorn and the trumpet is the conicality of the pipes. While both are cylindro-conical, i.e., combining cylindrical and conical sections, the flugelhorn is more conical than the trumpet. Benade (1990, 411) notes that conical instruments have fewer upper resonances than cylindrical instruments. This agrees with descriptions of the more conical flugelhorn as having a "darker" sound than the flugelhorn, as a "dark" tone is often associated with a lower spectral centroid (Schubert and Wolfe, 2006). 
 
 ## Methodology
 The methods used in this project involved three main steps. First, the resonances of the recorded trumpet and flugelhorn notes were analyzed using an FFT and compared with one another, with particular interest given to the relative amplitudes of all partials above the fundamental frequency of each note. This analysis was then used to create a simple model for the resonance of the flugelhorn, using linear interpolation to predict amplitude ratios for notes between the sample notes. Finally, this model was used to generate an additively synthesized flugelhorn note given either a recorded trumpet note or a MIDI note number. 
@@ -14,18 +14,22 @@ The audio recordings used in this file were recorded on a Yamaha 8335s Xeno seri
 ![image](https://user-images.githubusercontent.com/63251494/164769159-1d00afa3-0636-4476-8807-949e9a502e38.png)
 Figure 1: FFT of a G4 (F4 concert) on trumpet and flugelhorn
 
-After the peaks of all overtones were located, the relative strengths of the overtones across all partials for each note were compared. This comparison was chosen because the differences between trumpet and flugelhorn sounds are often described as a smaller amount of higher harmonics in the flugelhorn spectrum. Since we want to create a model that will interpolate the shape of the flugelhorn spectrum for various notes, we plot the ratio of the amplitude to the amplitude of the fundamental for a given harmonic over the f0 value for each of the recorded notes. For example, Figure 2 shows the relative strengths of the second harmonics over all of the f0 values. The f0 values are converted from frequencies to MIDI ntoe numbers so that the pitch is on a linear scale for the interpolation. We can see that... **put in a figure for 2nd harmonic and discuss the strengths**
+After the peaks of all overtones were located, the relative strengths of the overtones across all partials for each note were compared. This comparison was chosen because the differences between trumpet and flugelhorn sounds are often described as a smaller amount of higher harmonics in the flugelhorn spectrum. Since we want to create a model that will interpolate the shape of the flugelhorn spectrum for various notes, we plot the ratio of the amplitude to the amplitude of the fundamental for a given harmonic over the f0 value for each of the recorded notes. For example, Figure 2 shows the relative strengths of the second harmonics over all of the f0 values. The f0 values are converted from frequencies to MIDI note numbers so that the pitch is on a linear scale for the interpolation. We can see in Figure 2 that for the second harmonic, the amplitude ratio is higher in the trumpet than for the flugelhorn for low- and high-range f0's, but that for the G4, the second harmonic is stronger in the flugelhorn than in the trumpet, though both instruments have a stronger second harmonic for this particular note than for the others. 
 
 ![image](https://user-images.githubusercontent.com/63251494/164769359-c54e4b50-dd8a-4191-a41d-9b75b8aea16c.png)
 Figure 2: Second harmonic amplitude ratios for trumpet and flugelhorn
 
+By comparison, we can see in Figure 3 that the trumpet has consistently higher amplitude ratios for the fifth harmonic than the flugelhorn, supporting the hypothesis that the trumpet has stronger harmonic content in its higher overtones. Plots for all harmonics are available in the Matlab files, labeled "ar[harmonic number].fig".
+
+![image](https://user-images.githubusercontent.com/63251494/164779483-94fbff1f-a381-404e-b041-ac70aac4e688.png)
+Figure 3: Fifth harmonic amplitude ratios for trumpet and flugelhorn
 
 We can linearly interpolate between these values for any note in between the measured notes. In the case of the plot above, this means that we take the point along the line between two values that corresponds to our desired MIDI note number and use that value as the amplitude ratio for the second partial of that note. We can use the measured points to linearly interpolate the amplitude ratios of the seven (or six, for notes over the trumpet's B4, concert A4) partials above a given note. 
 
-In the last step, we use these linearly interpolated values to additively synthesize a single note at either the pitch of the input note or at the input MIDI note. The sine wave frequency and amplitude of the fundamental are taken directly from the FFT of the input file, or the frequency is taken from the MIDI note number and the amplitude is set to a default of 0.03. For each partial above that, a sinusoid is sampled at a whole number multiples of the fundamental, *nf0*, where *n* is an integer between 2 and 7. The sinusoids are summed up for all seven (or six) partials, as in the equation in Figure 3, where the *a_i*'s are the amplitudes for each partial, *a_0* is the fundamental frequency amplitude, and *f_0* is the fundamental frequency. 
+In the last step, we use these linearly interpolated values to additively synthesize a single note at either the pitch of the input note or at the input MIDI note. The sine wave frequency and amplitude of the fundamental are taken directly from the FFT of the input file, or the frequency is taken from the MIDI note number and the amplitude is set to a default of 0.03. For each partial above that, a sinusoid is sampled at a whole number multiples of the fundamental, *nf0*, where *n* is an integer between 2 and 7. The sinusoids are summed up for all seven (or six) partials, as in the equation in Figure 4, where the *a_i*'s are the amplitudes for each partial, *a_0* is the fundamental frequency amplitude, and *f_0* is the fundamental frequency. 
 
 ![image](https://user-images.githubusercontent.com/63251494/164767837-0d246574-fad6-4640-902a-34ac990098c2.png)
-Figure 3: Equation for additive synthesis using flugelhorn model
+Figure 4: Equation for additive synthesis using flugelhorn model
 
 
 ## Results
@@ -43,4 +47,21 @@ The recordings used were recorded on a single B flat trumpet and a single flugel
 As the envelope was not the main focus of this project, the envelope used was a simple linear envelope estimated from a single recording of a trumpet note. To create a more realistic-sounding synthesis, different types of envelopes could be explored, different envelope parameters could be used for the different harmonics, and envelope differences between flugelhorn and trumpet could be assessed for their influence on the timbre of the instruments. 
 
 ## Notes on the Matlab files
-How to get started/use the matlab files
+The files included with this project include all of the amplitude ratio and FFT figures used to get data, a spreadsheet of all the parameters found through the FFT analysis, and functions to generate a note using the flugelhorn and trumpet models, from a trumpet audio file source or given a MIDI number. To generate a synthesized flugelhorn note, you can use either of the commands:
+
+soundsc(flugelSound("tptG4.wav"), 44100)
+soundsc(flugelSound(76), 44100)
+
+Choosing option 1 for trumpet note input for the first example, or option 2 for the MIDI note input when prompted, changing the file name or MIDI note number as desired. Similarly, to generate a synthesized trumpet ntoe for comparison, you can use one of the commands:
+
+soundsc(trumpetSound("tptG4.wav"), 44100)
+soundsc(trumpetSound(76), 44100)
+
+with the appropriate input type options chosen when prompted. 
+
+## References
+Benade, Arthur. 1990. *Fundamentals of Musical Acoustics: Second, Revised Edition*. New York: Dover Publications, Inc.
+
+Forsyth, Cecil. 1949. *Orchestration, Second Edition*. New York: The Macmillan Company. 
+
+Schubert, Emery and Joe Wolfe. 2006. "Does Timbral Brightness Scale with Frequency and Spectral Centroid?" *Acta Acustics united with Acustica* 92, no. 5: 820–825. 
