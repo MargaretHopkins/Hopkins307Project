@@ -50,11 +50,13 @@ As the envelope was not the main focus of this project, the envelope used was a 
 The files included with this project include all of the amplitude ratio and FFT figures used to get data, a spreadsheet of all the parameters found through the FFT analysis, and functions to generate a note using the flugelhorn and trumpet models, from a trumpet audio file source or given a MIDI number. To generate a synthesized flugelhorn note, you can use either of the commands:
 
 soundsc(flugelSound("tptG4.wav"), 44100)
+
 soundsc(flugelSound(76), 44100)
 
 Choosing option 1 for trumpet note input for the first example, or option 2 for the MIDI note input when prompted, changing the file name or MIDI note number as desired. Similarly, to generate a synthesized trumpet ntoe for comparison, you can use one of the commands:
 
 soundsc(trumpetSound("tptG4.wav"), 44100)
+
 soundsc(trumpetSound(76), 44100)
 
 with the appropriate input type options chosen when prompted. 
