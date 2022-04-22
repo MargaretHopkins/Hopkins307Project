@@ -15,10 +15,13 @@ After the peaks of all overtones were located, the relative strengths of the ove
 
 We can linearly interpolate between these values for any note in between the measured notes. In the case of the plot above, this means that we take the point along the line between two values that corresponds to our desired MIDI note number and use that value as the amplitude ratio for the second partial of that note. We can use the measured points to linearly interpolate the amplitude ratios of the seven (or six, for notes over the trumpet's B4, concert A4) partials above a given note. 
 
-In the last step, we use these linearly interpolated values to additively synthesize a single note at either the pitch of the input note or at the input MIDI note. The sine wave frequency and amplitude of the fundamental are taken directly from the FFT of the input file, or the frequency is taken from the MIDI note number and the amplitude is set to a default of 0.03. For each partial above that, a sine wave is sampled at a whole number multiples of the fundamental, *nf0*, where *n* is an integer between 2 and 7. 
+In the last step, we use these linearly interpolated values to additively synthesize a single note at either the pitch of the input note or at the input MIDI note. The sine wave frequency and amplitude of the fundamental are taken directly from the FFT of the input file, or the frequency is taken from the MIDI note number and the amplitude is set to a default of 0.03. For each partial above that, a sinusoid is sampled at a whole number multiples of the fundamental, *nf0*, where *n* is an integer between 2 and 7. The sinusoids are summed up for all seven (or six) partials, as in the equation below, where the *a_i*'s are the amplitudes for each partial, *a_0* is the fundamental frequency amplitude, and *f_0* is the fundamental frequency. 
+
+![image](https://user-images.githubusercontent.com/63251494/164767837-0d246574-fad6-4640-902a-34ac990098c2.png)
+
 
 ## Results
-How does it sound?
+The results are best assessed by listening to the synthesized flugelhorn tones. See the section ["Notes on the Matlab Files"](https://github.com/MargaretHopkins/Hopkins307Project#notes-on-the-matlab-files) for instructions on generating tones using the Matlab scripts. 
 
 ## Difficulties/discussion
 
